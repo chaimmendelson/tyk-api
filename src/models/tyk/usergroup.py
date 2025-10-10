@@ -13,6 +13,7 @@ class TykUserGroupPermissions(BaseModel):
     analytics: Optional[TykPermissionLevel] = None
     api_assets: Optional[TykPermissionLevel] = None
     apis: Optional[TykPermissionLevel] = None
+    audit_logs: Optional[TykPermissionLevel] = None
     certs: Optional[TykPermissionLevel] = None
     hooks: Optional[TykPermissionLevel] = None
     idm: Optional[TykPermissionLevel] = None

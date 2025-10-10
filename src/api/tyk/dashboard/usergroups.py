@@ -30,8 +30,6 @@ class TykUserGroupsAPI:
     async def create_usergroup(self, group: TykUserGroupModel) -> TykUserGroupModel:
         
         body = group.model_dump(exclude_none=True)
-        
-        print(body)
 
         response = await self.api.client.post(self.base_uri, json=body)
         response.raise_for_status()
