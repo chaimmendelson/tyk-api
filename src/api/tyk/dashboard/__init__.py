@@ -1,1 +1,3 @@
 from .users import TykUsersApi
+from .usergroups import TykUserGroupsAPI
+from .identity_management_profile import TykIdentityManagementProfilesAPI

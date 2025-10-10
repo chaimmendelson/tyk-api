@@ -1,5 +1,7 @@
 from .dashboard import (
-    TykUsersApi
+    TykUsersApi,
+    TykUserGroupsAPI,
+    TykIdentityManagementProfilesAPI
 )
 
 from .dashboard_admin import (

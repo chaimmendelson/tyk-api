@@ -3,28 +3,38 @@ from pydantic import BaseModel
 from typing import Optional
 
 
-class PermissionLevel(str, Enum):
+class TykPermissionLevel(str, Enum):
     READ = "read"
     WRITE = "write"
     DENY = "deny"
 
 
 class TykUserGroupPermissions(BaseModel):
-    analytics: Optional[PermissionLevel] = None
-    api_assets: Optional[PermissionLevel] = None
-    apis: Optional[PermissionLevel] = None
-    certs: Optional[PermissionLevel] = None
-    hooks: Optional[PermissionLevel] = None
-    idm: Optional[PermissionLevel] = None
-    keys: Optional[PermissionLevel] = None
-    log: Optional[PermissionLevel] = None
-    oauth: Optional[PermissionLevel] = None
-    policies: Optional[PermissionLevel] = None
-    portal: Optional[PermissionLevel] = None
-    system: Optional[PermissionLevel] = None
-    user_groups: Optional[PermissionLevel] = None
-    users: Optional[PermissionLevel] = None
-    websockets: Optional[PermissionLevel] = None
+    analytics: Optional[TykPermissionLevel] = None
+    api_assets: Optional[TykPermissionLevel] = None
+    apis: Optional[TykPermissionLevel] = None
+    certs: Optional[TykPermissionLevel] = None
+    hooks: Optional[TykPermissionLevel] = None
+    idm: Optional[TykPermissionLevel] = None
+    keys: Optional[TykPermissionLevel] = None
+    log: Optional[TykPermissionLevel] = None
+    oauth: Optional[TykPermissionLevel] = None
+    policies: Optional[TykPermissionLevel] = None
+    portal: Optional[TykPermissionLevel] = None
+    system: Optional[TykPermissionLevel] = None
+    user_groups: Optional[TykPermissionLevel] = None
+    users: Optional[TykPermissionLevel] = None
+    websockets: Optional[TykPermissionLevel] = None
 
     class Config:
         use_enum_values = True
+
+
+class TykUserGroupModel(BaseModel):
+    id: Optional[str] = None
+    name: Optional[str] = None
+    org_id: Optional[str] = None
+    user_permissions: Optional[TykUserGroupPermissions] = TykUserGroupPermissions()
+    description: Optional[str] = None
+    active: Optional[bool] = True
+    password_max_days: Optional[int] = 0

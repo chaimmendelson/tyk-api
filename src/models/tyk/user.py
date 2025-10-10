@@ -10,8 +10,8 @@ class TykUserAdminPermissions(str, Enum):
     ADMIN = "admin"
 
 class TykUserPermissionsModel(TykUserGroupPermissions):
-    IsAdmin: Optional[TykUserAdminPermissions]
-    ResetPassword: Optional[TykUserAdminPermissions]
+    IsAdmin: Optional[TykUserAdminPermissions] = None
+    ResetPassword: Optional[TykUserAdminPermissions] = None
 
 class TykUserModel(BaseModel):
     id: Optional[str] = None
@@ -22,9 +22,7 @@ class TykUserModel(BaseModel):
     org_id: Optional[str] = None
     active: Optional[bool] = True
     access_key: Optional[str] = None
-    user_permissions: Optional[TykUserPermissionsModel] = Field(
-        default_factory=TykUserPermissionsModel
-    )
+    user_permissions: Optional[TykUserPermissionsModel] = TykUserPermissionsModel()
     group_id: Optional[str] = ""
     password_max_days: Optional[int] = None
     password_updated: Optional[datetime] = None

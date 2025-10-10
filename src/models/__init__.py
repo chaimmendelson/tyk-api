@@ -3,5 +3,12 @@ from .tyk import (
     TykUserPermissionsModel,
     TykUserAdminPermissions,
     TykUserGroupPermissions,
-    TykOrganizationModel
+    TykOrganizationModel,
+    TykUserGroupModel,
+    TykPermissionLevel,
+    TykIdentityManagementProfileModel,
+    TykIdentityManagementProfileUseProviderModel,
+    TykIdentityManagementProfileProviderConfigModel,
+    TykIdentityManagementProfileIdentityHandlerConfigModel,
+    TykIdentityManagementProfileProviderConstraintsModel
 )
