@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tyk-api"
+version = "0.0.1.dev1"
+description = """Wrapper for Tyk dashboard api."""
+readme = "README.md"
+authors = [{ name = "Chaim Mendelson" }]
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+dependencies = [
+    "horizon-fastapi-template>=0.0.5.dev1",
+    "pydantic[email]>=2.11.10",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tyk_api", "tyk_api.*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+
+addopts = "-ra -q --disable-warnings --strict-markers"
+
+markers = [
+    "asyncio: mark test to be run by the asyncio event loop",
+    "rest: mark test as needing a REST server",
+    "graphql: mark test as needing a GraphQL server",
+    "ftp: mark test as needing an ftp server",
+]
+
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)s] %(message)s"
+log_cli_date_format = "%H:%M:%S"
