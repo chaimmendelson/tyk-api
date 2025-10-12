@@ -1,4 +1,2 @@
-from .tyk import (
-    TykUserGenerator,
-    TykUserGroupGenerator
-)
+from .user import TykUserGenerator
+from .usergroup import TykUserGroupGenerator

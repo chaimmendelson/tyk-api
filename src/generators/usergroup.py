@@ -3,7 +3,7 @@ from src.models import TykPermissionLevel, TykUserGroupModel, TykUserGroupPermis
 class TykUserGroupGenerator:
 
     @staticmethod
-    def generate_regular_usergroup(name: str = "Regular User Group"):
+    def generate_basic_usergroup(name: str = "Basic User Group"):
         permissions = TykUserGroupPermissions(
             analytics=TykPermissionLevel.READ,
             api_assets=TykPermissionLevel.WRITE,
@@ -83,7 +83,7 @@ class TykUserGroupGenerator:
     @staticmethod
     def generate_no_access_usergroup(name: str = "No Access User Group"):
         permissions = TykUserGroupPermissions(
-            analytics=TykPermissionLevel.READ,
+            analytics=TykPermissionLevel.DENY,
             api_assets=TykPermissionLevel.DENY,
             apis=TykPermissionLevel.DENY,
             audit_logs=TykPermissionLevel.DENY,
@@ -109,21 +109,21 @@ class TykUserGroupGenerator:
     @staticmethod
     def generate_gateway_usergroup(name: str = "Gateway User Group"):
         permissions = TykUserGroupPermissions(
-            analytics=TykPermissionLevel.READ,
-            api_assets=TykPermissionLevel.READ,
+            analytics=TykPermissionLevel.DENY,
+            api_assets=TykPermissionLevel.DENY,
             apis=TykPermissionLevel.READ,
-            audit_logs=TykPermissionLevel.READ,
-            certs=TykPermissionLevel.READ,
-            hooks=TykPermissionLevel.WRITE,
-            idm=TykPermissionLevel.READ,
+            audit_logs=TykPermissionLevel.DENY,
+            certs=TykPermissionLevel.DENY,
+            hooks=TykPermissionLevel.READ,
+            idm=TykPermissionLevel.DENY,
             keys=TykPermissionLevel.WRITE,
-            log=TykPermissionLevel.READ,
+            log=TykPermissionLevel.DENY,
             oauth=TykPermissionLevel.WRITE,
             policies=TykPermissionLevel.READ,
             portal=TykPermissionLevel.DENY,
             system=TykPermissionLevel.DENY,
-            user_groups=TykPermissionLevel.READ,
-            users=TykPermissionLevel.READ,
+            user_groups=TykPermissionLevel.DENY,
+            users=TykPermissionLevel.DENY,
             websockets=TykPermissionLevel.WRITE
         )
 

@@ -1,23 +1,22 @@
-from horizon_fastapi_template.utils import BaseAPI
+from ..base import BaseAPI, TykApi
 from src.models import TykUserModel
 
 USERS_KEY = "users"
 
-class TykUsersApi:
+class TykUsersApi(TykApi):
     def __init__(
             self,
             api: BaseAPI,
             base_uri: str = "/api/users",
     ):
-        self.api = api
-        self.base_uri = base_uri
+        super().__init__(api, base_uri)
 
     async def get_users(self) -> list[TykUserModel]:
         response = await self.api.client.get(self.base_uri)
         response.raise_for_status()
 
-        users_data = response.json().get(USERS_KEY, {})
-
+        users_data = response.json().get(USERS_KEY, []) or []
+        
         return [TykUserModel.model_validate(user) for user in users_data]
 
     async def get_user(self, user_id: str) -> TykUserModel:
@@ -61,6 +60,6 @@ class TykUsersApi:
 
         response.raise_for_status()
 
-        users_data = response.json().get(USERS_KEY, {})
-
+        users_data = response.json().get(USERS_KEY, []) or []
+        
         return [TykUserModel.model_validate(user) for user in users_data]

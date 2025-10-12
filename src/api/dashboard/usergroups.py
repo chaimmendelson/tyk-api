@@ -1,23 +1,22 @@
-from horizon_fastapi_template.utils import BaseAPI
+from ..base import BaseAPI, TykApi
 from src.models import TykUserGroupModel, TykUserGroupPermissions
 
 USER_GROUPS_KEY = "groups"
 
-class TykUserGroupsAPI:
+class TykUserGroupsAPI(TykApi):
     
     def __init__(
             self,
             api: BaseAPI,
             base_uri: str = "/api/usergroups",
     ):
-        self.api = api
-        self.base_uri = base_uri
+        super().__init__(api, base_uri)
         
     async def get_usergroups(self) -> list[TykUserGroupModel]:
         response = await self.api.client.get(self.base_uri)
         response.raise_for_status()
 
-        user_groups_data = response.json().get(USER_GROUPS_KEY, [])
+        user_groups_data = response.json().get(USER_GROUPS_KEY, []) or []
 
         return [TykUserGroupModel.model_validate(group) for group in user_groups_data]
 

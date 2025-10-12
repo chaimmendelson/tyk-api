@@ -1,12 +1,11 @@
-from horizon_fastapi_template.utils import BaseAPI
+from ..base import BaseAPI, TykApi
 from src.models import TykUserModel
 
 
-class TykUsersAdminApi:
+class TykUsersAdminApi(TykApi):
 
     def __init__(self, api: BaseAPI, base_uri: str = "/admin/users"):
-        self.api = api
-        self.base_uri = base_uri
+        super().__init__(api, base_uri)
 
     async def create_user(self, user: TykUserModel) -> TykUserModel:
         body = user.model_dump(exclude_none=True, exclude={"password"}, mode="json")
@@ -15,7 +14,7 @@ class TykUsersAdminApi:
 
         response.raise_for_status()
 
-        created_user = TykUserModel.model_validate(response.json().get("Meta", {}))
+        created_user = TykUserModel.model_validate(response.json().get("Meta", {}) or {})
 
         if user.password is not None:
             created_user.password = user.password

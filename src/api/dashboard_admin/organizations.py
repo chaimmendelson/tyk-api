@@ -1,22 +1,21 @@
-from horizon_fastapi_template.utils import BaseAPI
+from ..base import BaseAPI, TykApi
 from src.models import TykOrganizationModel
 
 ORGANIZATIONS_KEY = "organisations"
 
-class TykOrganizationsApi:
+class TykOrganizationsApi(TykApi):
     def __init__(
             self,
             api: BaseAPI,
             base_uri: str = "/admin/organisations",
     ):
-        self.api = api
-        self.base_uri = base_uri
+        super().__init__(api, base_uri)
 
     async def get_organizations(self) -> list[TykOrganizationModel]:
         response = await self.api.client.get(self.base_uri)
         response.raise_for_status()
 
-        organizations_data = response.json().get(ORGANIZATIONS_KEY, {})
+        organizations_data = response.json().get(ORGANIZATIONS_KEY, []) or []
 
         return [TykOrganizationModel.model_validate(org) for org in organizations_data]
 
