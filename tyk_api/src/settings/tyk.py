@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 
 class TykSettings(BaseSettings):
     
-    READ_WRITE_GROUP_NAME: str =  Field(
+    READ_WRITE_USER_GROUP_NAME: str =  Field(
         default="Read-Write User Group",
         description="The name of the Read-Write user group to be created in Tyk.",
     )
@@ -11,7 +11,7 @@ class TykSettings(BaseSettings):
         default="Basic User Group",
         description="The name of the Basic user group to be created in Tyk.",
     )
-    READ_ONLY_GROUP_NAME: str = Field(
+    READ_ONLY_USER_GROUP_NAME: str = Field(
         default="Read-Only User Group",
         description="The name of the Read-Only user group to be created in Tyk.",
     )
@@ -19,9 +19,13 @@ class TykSettings(BaseSettings):
         default="Gateway User Group",
         description="The name of the Gateway user group to be created in Tyk.",
     )
-    DENY_ALL_GROUP_NAME: str = Field(
+    DENY_ALL_USER_GROUP_NAME: str = Field(
         default="Deny-All User Group",
         description="The name of the Deny-All user group to be created in Tyk.",
+    )
+    PERMISSIONS_FILE: str = Field(
+        default="permissions.yaml",
+        description="Path to the YAML file defining user group permissions.",
     )
     
     ADMIN_AUTH: str = Field(

@@ -12,3 +12,7 @@ from .tyk import (
     TykIdentityManagementProfileIdentityHandlerConfigModel,
     TykIdentityManagementProfileProviderConstraintsModel
 )
+
+from .wrapper import (
+    MainUserGroups
+)

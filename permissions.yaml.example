@@ -1,0 +1,104 @@
+# --------------------------------------------
+# BASIC permissions — standard user access
+# --------------------------------------------
+basic:
+  analytics: read
+  api_assets: write
+  apis: write
+  audit_logs: read
+  certs: deny
+  hooks: write
+  idm: deny
+  keys: write
+  log: read
+  oauth: deny
+  policies: write
+  portal: deny
+  system: deny
+  user_groups: deny
+  users: read
+  websockets: write
+
+# --------------------------------------------
+# READ_ONLY permissions — view-only access
+# --------------------------------------------
+read_only:
+  analytics: read
+  api_assets: read
+  apis: read
+  audit_logs: read
+  certs: deny
+  hooks: read
+  idm: deny
+  keys: read
+  log: read
+  oauth: deny
+  policies: read
+  portal: deny
+  system: deny
+  user_groups: deny
+  users: read
+  websockets: read
+
+# --------------------------------------------
+# READ_WRITE permissions — full CRUD access
+# --------------------------------------------
+read_write:
+  analytics: read
+  api_assets: write
+  apis: write
+  audit_logs: read
+  certs: write
+  hooks: write
+  idm: write
+  keys: write
+  log: read
+  oauth: write
+  policies: write
+  portal: write
+  system: read
+  user_groups: write
+  users: write
+  websockets: write
+
+# --------------------------------------------
+# GATEWAY permissions — limited service-level access
+# --------------------------------------------
+gateway:
+  analytics: deny
+  api_assets: deny
+  apis: read
+  audit_logs: deny
+  certs: deny
+  hooks: read
+  idm: deny
+  keys: write
+  log: deny
+  oauth: write
+  policies: read
+  portal: deny
+  system: deny
+  user_groups: deny
+  users: deny
+  websockets: write
+
+# --------------------------------------------
+# DENY_ALL permissions — explicit deny
+# --------------------------------------------
+deny_all:
+  analytics: deny
+  api_assets: deny
+  apis: deny
+  audit_logs: deny
+  certs: deny
+  hooks: deny
+  idm: deny
+  keys: deny
+  log: deny
+  oauth: deny
+  policies: deny
+  portal: deny
+  system: deny
+  user_groups: deny
+  users: deny
+  websockets: deny
