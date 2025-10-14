@@ -27,7 +27,7 @@ class TykOrganizationGenerator:
     def generate_from_application(application: str, name: str) -> TykOrganizationModel:
         owner_slug = validate_application_name(application)
         owner_name = concat_application_organization(application, name)
-        cname = owner_slug
+        cname = owner_name
 
         return TykOrganizationGenerator.generate(
             owner_name=owner_name,
