@@ -33,10 +33,18 @@ class TykSettings(BaseSettings):
         description="The Tyk Admin Auth token.",
     )
     
-    SUPER_ADMIN_EMAIL: EmailStr = Field(
+    EMAIL_DOMAIN: str = Field(
         ...,
-        description="The email address of the Super Admin user to be created in Tyk.",
+        description="The email domain to be used for creating users in Tyk.",
+        pattern=r"^[^@]([a-zA-Z0-9]+\.[a-zA-Z0-9]+)$"
     )
+
+    SUPER_ADMIN_USERNAME: str = Field(
+        ...,
+        description="The username of the Super Admin user to be created in Tyk.",
+        pattern=r""
+    )
+    
     SUPER_ADMIN_PASSWORD: str = Field(
         ...,
         description="The password of the Super Admin user to be created in Tyk.",
@@ -47,9 +55,9 @@ class TykSettings(BaseSettings):
         description="The URL of the Tyk Dashboard.",
     )
 
-    ORG_ADMIN_EMAIL: EmailStr = Field(
+    ORG_ADMIN_USERNAME: str = Field(
         ...,
-        description="The email address of the Organization Admin user to be created in Tyk.",
+        description="The username of the Organization Admin user to be created in Tyk.",
     )
     
     ORG_ADMIN_PASSWORD: str = Field(
@@ -57,7 +65,7 @@ class TykSettings(BaseSettings):
         description="The password of the Organization Admin user to be created in Tyk.",
     )
 
-    GATEWAY_USER_EMAIL: EmailStr = Field(
+    GATEWAY_USER_USERNAME: str = Field(
         ...,
-        description="The email address of the Gateway user to be created in Tyk.",
+        description="The username of the Gateway user to be created in Tyk.",
     )

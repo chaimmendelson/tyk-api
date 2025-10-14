@@ -14,5 +14,6 @@ from .tyk import (
 )
 
 from .wrapper import (
-    MainUserGroups
+    MainUserGroups,
+    MainUserTypes
 )

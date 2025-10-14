@@ -29,6 +29,13 @@ def _build_permission(group_name: str) -> TykUserGroupPermissions:
     defaults = {field: TykPermissionLevel.DENY for field in TykUserGroupPermissions.model_fields.keys()}
 
     provided_raw = _RAW_PERMISSIONS.get(group_name.lower(), {})
+    
+    if not isinstance(provided_raw, dict):
+        raise ValueError(f"Invalid permissions format for group '{group_name}': {provided_raw}")
+    
+    if not provided_raw:
+        raise ValueError(f"No permissions defined for group '{group_name}'")
+    
     provided = {
         key: TykPermissionLevel[value.upper()]
         for key, value in provided_raw.items()

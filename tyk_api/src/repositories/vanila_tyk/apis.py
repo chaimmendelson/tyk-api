@@ -12,6 +12,9 @@ class TykApisRepository(TykDashboardRepository):
     async def get_apis(self) -> List[str]:
         return await self.api.get_apis()
     
+    async def get_api(self, api_id: str) -> dict:
+        return await self.api.get_api(api_id)
+
     async def delete_api(self, api_id: str) -> None:
         await self.api.delete_api(api_id)
         

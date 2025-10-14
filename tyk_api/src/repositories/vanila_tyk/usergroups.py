@@ -1,6 +1,7 @@
 from tyk_api.src.api import TykUserGroupsAPI
 from tyk_api.src.models import TykUserGroupModel
 from .base import TykDashboardRepository
+from tyk_api.src.errors import TykNameConflictError
 
 class TykUserGroupsRepository(TykDashboardRepository[TykUserGroupsAPI]):
 
@@ -10,6 +11,11 @@ class TykUserGroupsRepository(TykDashboardRepository[TykUserGroupsAPI]):
         super().__init__(api)
 
     async def create_usergroup(self, usergroup: TykUserGroupModel) -> TykUserGroupModel:
+        existing_usergroups = await self.get_usergroups_by_name(usergroup.name or "")
+        
+        if existing_usergroups:
+            raise TykNameConflictError("usergroup", usergroup.name or "")
+        
         return await self.api.create_usergroup(usergroup)
     
     async def get_usergroups(self) -> list[TykUserGroupModel]:
@@ -22,6 +28,9 @@ class TykUserGroupsRepository(TykDashboardRepository[TykUserGroupsAPI]):
     
     async def get_usergroup_by_id(self, usergroup_id: str) -> TykUserGroupModel | None:
         return await self.api.get_usergroup(usergroup_id)
+
+    async def update_usergroup(self, usergroup: TykUserGroupModel) -> None:
+        await self.api.update_usergroup(usergroup)
 
     async def delete_usergroup(self, usergroup: TykUserGroupModel) -> None:
         await self.api.delete_usergroup(usergroup)

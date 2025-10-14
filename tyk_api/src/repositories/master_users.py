@@ -20,8 +20,8 @@ class TempSuperAdminCTX:
         self.user: TykUserModel | None = None
 
     async def __aenter__(self) -> TykUserModel:
-        temp_email = f"temp_admin_{random.randint(10000, 99999)}@example.com"
-        temp_user = TykUserGenerator.generate_super_admin_user(email_address=temp_email)
+        temp_username = f"temp_admin_{random.randint(10000, 99999)}"
+        temp_user = TykUserGenerator.generate_super_admin_user(username=temp_username)
         self.user = await self.api.create_user(temp_user)
         return self.user
 
@@ -43,6 +43,7 @@ class TykMasterUsersRepository:
     def __init__(self):
         self.api = get_tyk_users_admin_api()
         self.super_admin_access_key: str | None = None
+        self.super_admin: TykUserModel | None = None
 
     # ---------------------------
     # Super Admin Handling
@@ -58,10 +59,11 @@ class TykMasterUsersRepository:
     async def bootstrap_super_admin(self) -> None:
         """Create a super admin user if none exists."""
         user = TykUserGenerator.generate_super_admin_user(
-            email_address=settings.SUPER_ADMIN_EMAIL,
+            username=settings.SUPER_ADMIN_USERNAME,
             password=settings.SUPER_ADMIN_PASSWORD,
         )
         created_user = await self.api.create_user(user)
+        self.super_admin = created_user
         self.set_access_key(created_user.access_key)
 
     async def _fetch_super_admin_access_key_if_exists(self) -> str | None:
@@ -70,10 +72,11 @@ class TykMasterUsersRepository:
             try:
                 async with TempSuperAdminCTX() as temp_admin:
                     user_api = get_tyk_users_api(temp_admin.access_key or "")
-                    all_users = await user_api.search_users(settings.SUPER_ADMIN_EMAIL)
+                    all_users = await user_api.search_users(settings.SUPER_ADMIN_USERNAME)
 
                     for user in all_users or []:
                         if not user.org_id:  # indicates system-level super admin
+                            self.super_admin = user
                             return user.access_key
 
             except Exception as e:
@@ -105,7 +108,7 @@ class TykMasterUsersRepository:
         org_admin_user = TykUserGenerator.generate_org_admin_user(
             password=settings.ORG_ADMIN_PASSWORD,
             org_id=org_id,
-            email_address=settings.ORG_ADMIN_EMAIL,
+            username=settings.ORG_ADMIN_USERNAME,
         )
 
         return await users_repo.create_user(org_admin_user)
@@ -113,13 +116,13 @@ class TykMasterUsersRepository:
     async def get_org_admin_api_key(self, org_id: str) -> str | None:
         """Return the org admin API key for an org, creating it if needed."""
         users_api = get_tyk_users_api(self.super_admin_access_key or "")
-        users_repo = TykUsersRepository(users_api, self.api)
 
-        org_users = await users_repo.get_users_by_organization(org_id)
+        all_users = await users_api.search_users(settings.ORG_ADMIN_USERNAME)
 
-        for user in org_users:
-            if user.email_address == settings.ORG_ADMIN_EMAIL:
+        for user in all_users:
+            if user.org_id == org_id:
                 return user.access_key
 
         user = await self.bootstrap_org_admin(org_id)
+    
         return user.access_key if user else None

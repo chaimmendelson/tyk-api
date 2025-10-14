@@ -15,7 +15,7 @@ class TykAssetsApi(TykDashboardApi):
         
         object_ids = [
             obj.get("_id", "")
-            for obj in response.json()
+            for obj in response.json() or []
         ]
         
         return object_ids

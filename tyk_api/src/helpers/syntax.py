@@ -31,6 +31,12 @@ def concat_application_organization(app_name: str, org_name: str) -> str:
     app_name = validate_application_name(app_name)
     org_name = validate_organization_name(org_name)
     
+    if org_name == app_name:
+        return app_name
+    
+    if org_name.startswith(f"{app_name}{app_org_sep}"):
+        return org_name
+    
     return f"{app_name}{app_org_sep}{org_name}"
 
 def check_application_name(existing_apps: list, new_app_name: str) -> bool:

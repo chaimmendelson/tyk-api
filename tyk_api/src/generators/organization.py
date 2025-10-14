@@ -8,6 +8,10 @@ class TykOrganizationGenerator:
         owner_slug: str,
         cname: str | None = None,
     ) -> TykOrganizationModel:
+        owner_name = owner_name.lower().strip()
+        owner_slug = owner_slug.lower().strip()
+        cname = cname.lower().strip() if cname else None
+        
         org = TykOrganizationModel(
             owner_name=owner_name,
             owner_slug=owner_slug,
