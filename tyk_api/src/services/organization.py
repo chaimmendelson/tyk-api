@@ -1,136 +1,109 @@
 from ..repositories import (
-    get_tyk_organizations_repository,
+    TykApisRepository,
+    TykAssetsRepository,
+    TykCertificatesRepository,
+    TykKeysRepository,
     TykOrganizationsRepository,
-    master_users_repo,
-    
-    get_tyk_apis_repository,
-    get_tyk_assets_repository,
-    get_tyk_certificates_repository,
-    get_tyk_policies_repository,
-    get_tyk_keys_repository,
-    get_tyk_webhooks_repository,
-    get_tyk_users_repository,
-    get_tyk_usergroups_repository,
+    TykPoliciesRepository,
+    TykUsersRepository,
+    TykUserGroupsRepository,
+    TykWebHooksRepository,
+    TykMasterUsersRepository,
+    TykApplicationsRepository,
 )
 
-from ..settings import settings
-from ..models import TykOrganizationModel, MainUserTypes
-from ..generators import TykOrganizationGenerator, TykUserGenerator
-from ..errors import TykAPIError, TykNameConflictError
+from ..models import TykOrganizationModel, CreateOrganizationRequest, CreateBasicUserRequest
+from ..generators import TykUserGenerator
+from ..errors import TykAPIError, TykBadRequestError
 from loguru import logger
 
-from .basic_users import BasicUsersService
-
 class OrganizationService:
-    
-    def __init__(self):
-        self.repo: TykOrganizationsRepository | None = None
 
-    async def _initialize_repo(self) -> None:
-        if not self.repo:
-            self.repo = await get_tyk_organizations_repository()
+    @staticmethod
+    async def get_repo() -> TykOrganizationsRepository:
+        return await TykOrganizationsRepository.instance()
 
-    async def _bottstrap_organization_resources(self, org: TykOrganizationModel, user_password: str | None = None) -> None:
-        if not org.id:
-            raise TykAPIError("Organization ID is not set, cannot bootstrap resources.")
+    @staticmethod
+    async def bootstrap_organization_resources(org: TykOrganizationModel, user_password: str | None = None) -> None:
 
-        await master_users_repo.bootstrap_org_admin(org.id)
-        
-        users_service = BasicUsersService()
-        
-        await users_service._initialize_repo()
+        await (await TykMasterUsersRepository.instance()).bootstrap_org_admin(org.id)
 
-        await users_service.create_main_gateway_user(org)
-        
+        users_repo = await TykUsersRepository.instance(org_id=org.id)
+
         if user_password:
             if org.owner_name:
-                await users_service.create_user(
-                    user_type=MainUserTypes.BASIC_USER,
-                    user=TykUserGenerator.generate_clean_user(org.owner_name, org.id, password=user_password),
+                user = CreateBasicUserRequest(
+                    org_id=org.id,
+                    username=org.owner_name,
+                    password=user_password,
+                )
+                await users_repo.create_user(
+                    user=await user.generate_user,
                 )
             if org.owner_slug and org.owner_slug != org.owner_name:
-                await users_service.create_user(
-                    user_type=MainUserTypes.BASIC_USER,
-                    user=TykUserGenerator.generate_clean_user(org.owner_slug, org.id, password=user_password),
+                
+                user = CreateBasicUserRequest(
+                    org_id=org.id,
+                    username=org.owner_slug,
+                    password=user_password,
+                )
+                
+                await users_repo.create_user(
+                    user=await user.generate_user,
                 )
 
-    async def create_organization(self, app_name: str, org_name: str, user_password: str | None = None) -> TykOrganizationModel:
-        await self._initialize_repo()
-        
-        if not self.repo:
-            raise TykAPIError("Organizations repository not initialized.")
+    @staticmethod
+    async def create_organization(org: CreateOrganizationRequest) -> TykOrganizationModel:
 
-        org_model = TykOrganizationGenerator.generate_from_application(app_name, org_name)
+        repo = await OrganizationService.get_repo()
+        applications_repo = await TykApplicationsRepository.instance(admin=True)
+
+        if not await applications_repo.application_usergroup_exists(org.app_name):
+            raise TykBadRequestError(f"Application '{org.app_name}' does not exist. Cannot create organization.")
+
+        organization = await repo.create_organization(org.generate_organization)
+
+        logger.info(f"Created organization {organization.id} - {organization.owner_name}")
         
-        try:
-            org_model = await self.repo.create_organization(org_model)
-            logger.info(f"Created organization {org_model.id} - {org_model.owner_name}")
-            await self._bottstrap_organization_resources(org_model, user_password=user_password)
-            return org_model
-        except TykNameConflictError as e:
-            logger.error(f"Organization with owner name '{org_model.owner_name}' already exists.")
-            raise e
-        except Exception as e:
-            logger.error(f"Error creating organization: {e}")
-            
-            if org_model.id:
-                await self.delete_organization(org_model)
-                
-            raise TykAPIError("Failed to create organization and bootstrap resources.")
-    
-    async def get_organization(self, org_id: str) -> TykOrganizationModel | None:
-        await self._initialize_repo()
-        
-        if not self.repo:
-            raise TykAPIError("Organizations repository not initialized.")
-        
-        return await self.repo.get_organization_by_id(org_id)
-    
-    async def delete_organization(self, org: TykOrganizationModel) -> None:
-        if not self.repo:
-            raise TykAPIError("Organizations repository not initialized.")
-        
+        return organization
+
+    @staticmethod
+    async def delete_organization(org: TykOrganizationModel) -> None:
+
+        repo = await OrganizationService.get_repo()
+
         if not org.id:
             raise TykAPIError("Organization ID is not set, cannot delete organization.")
         
         try:
-            assets_repo = await get_tyk_assets_repository(org.id)
-            assets = await assets_repo.get_assets()
-            for asset in assets or []:
-                await assets_repo.delete_asset(asset)
+            await (await TykAssetsRepository.instance(org_id=org.id)).delete_all_assets()
         except Exception as e:
             logger.error(f"Error deleting assets for organization {org.id}: {e}")
             raise TykAPIError(f"Failed to delete assets for organization {org.id}")
         
         try:
-            apis_repo = await get_tyk_apis_repository(org.id)
-            apis = await apis_repo.get_apis()
-            for api in apis or []:
-                await apis_repo.delete_api(api)
+            apis_repo = await TykApisRepository.instance(org_id=org.id)
+            await apis_repo.delete_all_apis()
         except Exception as e:
             logger.error(f"Error deleting APIs for organization {org.id}: {e}")
             raise TykAPIError(f"Failed to delete APIs for organization {org.id}")
         
         try:
-            certificates_repo = await get_tyk_certificates_repository(org.id)
-            certificates = await certificates_repo.get_certificates()
-            for cert in certificates or []:
-                await certificates_repo.delete_certificate(cert)
+            certificates_repo = await TykCertificatesRepository.instance(org_id=org.id)
+            await certificates_repo.delete_all_certificates()
         except Exception as e:
             logger.error(f"Error deleting certificates for organization {org.id}: {e}")
             raise TykAPIError(f"Failed to delete certificates for organization {org.id}")
         
         try:
-            policies_repo = await get_tyk_policies_repository(org.id)
-            policies = await policies_repo.get_policies()
-            for policy in policies or []:
-                await policies_repo.delete_policy(policy)
+            policies_repo = await TykPoliciesRepository.instance(org_id=org.id)
+            await policies_repo.delete_all_policies()
         except Exception as e:
             logger.error(f"Error deleting policies for organization {org.id}: {e}")
             raise TykAPIError(f"Failed to delete policies for organization {org.id}")
         
         try:
-            usergroups_repo = await get_tyk_usergroups_repository(org.id)
+            usergroups_repo = await TykUserGroupsRepository.instance(org_id=org.id)
             usergroups = await usergroups_repo.get_usergroups()
             for usergroup in usergroups or []:
                 await usergroups_repo.delete_usergroup(usergroup)
@@ -139,26 +112,22 @@ class OrganizationService:
             raise TykAPIError(f"Failed to delete user groups for organization {org.id}")
 
         try:
-            keys_repo = await get_tyk_keys_repository(org.id)
-            keys = await keys_repo.get_keys(org_id=org.id)
-            for key in keys or []:
-                await keys_repo.delete_key(key)
+            keys_repo = await TykKeysRepository.instance(org_id=org.id)
+            await keys_repo.delete_all_keys()
         except Exception as e:
             logger.error(f"Error deleting keys for organization {org.id}: {e}")
             raise TykAPIError(f"Failed to delete keys for organization {org.id}")
 
 
         try:
-            webhooks_repo = await get_tyk_webhooks_repository(org.id)
-            webhooks = await webhooks_repo.get_webhooks()
-            for webhook in webhooks or []:
-                await webhooks_repo.delete_webhook(webhook)
+            webhooks_repo = await TykWebHooksRepository.instance(org_id=org.id)
+            await webhooks_repo.delete_all_webhooks()
         except Exception as e:
             logger.error(f"Error deleting webhooks for organization {org.id}: {e}")
             raise TykAPIError(f"Failed to delete webhooks for organization {org.id}")
 
         try:
-            users_repo = await get_tyk_users_repository()
+            users_repo = await TykUsersRepository.instance(admin=True)
             users = await users_repo.get_users_by_organization(org.id)
             for user in users or []:
                 await users_repo.delete_user(user)
@@ -167,7 +136,7 @@ class OrganizationService:
             raise TykAPIError(f"Failed to delete users for organization {org.id}")
         
         try:
-            await self.repo.delete_organization(org)
+            await repo.delete_organization(org)
             logger.info(f"Deleted organization {org.id} - {org.owner_name}")
         except Exception as e:
             logger.error(f"Error deleting organization: {e}")

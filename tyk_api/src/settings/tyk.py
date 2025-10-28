@@ -1,4 +1,4 @@
-from pydantic import EmailStr, Field
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
 class TykSettings(BaseSettings):
@@ -68,4 +68,9 @@ class TykSettings(BaseSettings):
     GATEWAY_USER_USERNAME: str = Field(
         ...,
         description="The username of the Gateway user to be created in Tyk.",
+    )
+
+    PASSWORD_REGEX: str = Field(
+        default=r"^(?:[A-Za-z]*\d[A-Za-z\d]*[A-Za-z]+|[A-Za-z]*[A-Za-z]+[A-Za-z\d]*\d)[A-Za-z\d]*$",
+        description="The regex pattern for validating user passwords.",
     )

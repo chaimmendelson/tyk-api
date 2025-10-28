@@ -1,9 +1,3 @@
-from .base import TykAPIError
-from .syntax import (
-    TykAPISyntaxError,
-    TykAPIInvalidParameterError,
-)
-from .wrapper import (
-    TykAPIWrapperError,
-    TykNameConflictError,
-)
+from .base import *
+from .syntax import *
+from .wrapper import *

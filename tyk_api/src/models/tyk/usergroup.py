@@ -32,10 +32,22 @@ class TykUserGroupPermissions(BaseModel):
 
 
 class TykUserGroupModel(BaseModel):
-    id: Optional[str] = None
+    id: str
     name: Optional[str] = None
     org_id: Optional[str] = None
     user_permissions: Optional[TykUserGroupPermissions] = TykUserGroupPermissions()
     description: Optional[str] = None
     active: Optional[bool] = True
     password_max_days: Optional[int] = 0
+    
+class TykUserGroupCreateModel(BaseModel):
+    name: str
+    org_id: Optional[str] = None
+    user_permissions: Optional[TykUserGroupPermissions] = TykUserGroupPermissions()
+    description: Optional[str] = None
+    active: Optional[bool] = True
+    password_max_days: Optional[int] = 0
+
+
+class TykUserGroupUpdateModel(TykUserGroupCreateModel):
+    id: str

@@ -12,7 +12,7 @@ from tyk_api.src.settings import settings
 PERMISSIONS_FILE = Path(settings.PERMISSIONS_FILE or "permissions.yaml")
 
 
-def _load_permissions_file() -> dict:
+def _load_permissions_file() -> dict[str, dict[str, str]]:
     if not PERMISSIONS_FILE.exists():
         raise FileNotFoundError(f"Permissions file not found: {PERMISSIONS_FILE}")
     return yaml.safe_load(PERMISSIONS_FILE.read_text())
@@ -30,14 +30,11 @@ def _build_permission(group_name: str) -> TykUserGroupPermissions:
 
     provided_raw = _RAW_PERMISSIONS.get(group_name.lower(), {})
     
-    if not isinstance(provided_raw, dict):
-        raise ValueError(f"Invalid permissions format for group '{group_name}': {provided_raw}")
-    
     if not provided_raw:
         raise ValueError(f"No permissions defined for group '{group_name}'")
     
     provided = {
-        key: TykPermissionLevel[value.upper()]
+        key: TykPermissionLevel(value)
         for key, value in provided_raw.items()
     }
 

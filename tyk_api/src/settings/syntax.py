@@ -16,3 +16,8 @@ class Settings(BaseSettings):
         default=r"^[a-zA-Z0-9-]+$",
         description="Regex pattern for validating organization names"
     )
+    
+    APPLICATION_USERGROUP_PREFIX: str = Field(
+        default="application_usergroup_",
+        description="Prefix for application user group names"
+    )

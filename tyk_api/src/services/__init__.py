@@ -1,3 +1,3 @@
-from .admin_usergroups import AdminUserGroupService
-from .basic_users import BasicUsersService
+from .usergroups import UserGroupService
+from .users import UsersService
 from .organization import OrganizationService

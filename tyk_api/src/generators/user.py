@@ -1,5 +1,6 @@
 from pydantic import EmailStr
 from tyk_api.src.models import (
+    TykUserCreateModel,
     TykUserModel,
     TykUserAdminPermissions,
     TykUserPermissionsModel,
@@ -28,8 +29,8 @@ class TykUserGenerator:
         return TykUserPermissionsModel(system=TykPermissionLevel.DENY)
 
     @staticmethod
-    def generate_super_admin_user(username: str, password: str | None = None) -> TykUserModel:
-        return TykUserModel(
+    def generate_super_admin_user(username: str, password: str | None = None) -> TykUserCreateModel:
+        return TykUserCreateModel(
             first_name=username.capitalize(),
             last_name="SuperAdmin",
             email_address=TykUserGenerator._create_email(username),
@@ -38,8 +39,8 @@ class TykUserGenerator:
         )
 
     @staticmethod
-    def generate_org_admin_user(org_id: str, username: str, password: str | None = None) -> TykUserModel:
-        return TykUserModel(
+    def generate_org_admin_user(org_id: str, username: str, password: str | None = None) -> TykUserCreateModel:
+        return TykUserCreateModel(
             first_name=username.capitalize(),
             last_name="Admin",
             email_address=TykUserGenerator._create_email(username),
@@ -49,8 +50,8 @@ class TykUserGenerator:
         )
 
     @staticmethod
-    def generate_basic_user(org_id: str, group_id: str, username: str, password: str | None = None) -> TykUserModel:
-        return TykUserModel(
+    def generate_basic_user(org_id: str, group_id: str, username: str, password: str | None = None) -> TykUserCreateModel:
+        return TykUserCreateModel(
             first_name=username.capitalize(),
             last_name="User",
             email_address=TykUserGenerator._create_email(username),
@@ -61,8 +62,8 @@ class TykUserGenerator:
         )
 
     @staticmethod
-    def generate_gateway_user(org_id: str, group_id: str, username: str) -> TykUserModel:
-        return TykUserModel(
+    def generate_gateway_user(org_id: str, group_id: str, username: str) -> TykUserCreateModel:
+        return TykUserCreateModel(
             first_name=username.capitalize(),
             last_name="User",
             email_address=TykUserGenerator._create_email(username),
@@ -72,8 +73,8 @@ class TykUserGenerator:
         )
         
     @staticmethod
-    def generate_clean_user(username: str, org_id: str | None = None, password: str | None = None) -> TykUserModel:
-        return TykUserModel(
+    def generate_clean_user(username: str, org_id: str | None = None, password: str | None = None) -> TykUserCreateModel:
+        return TykUserCreateModel(
             first_name=username.capitalize(),
             last_name="User",
             email_address=TykUserGenerator._create_email(username),
@@ -83,24 +84,24 @@ class TykUserGenerator:
         )
         
     @staticmethod
-    def generate(user_type: MainUserTypes, org_id: str | None, group_id: str | None, username: str, password: str | None = None) -> TykUserModel:
+    def generate(user_type: MainUserTypes, org_id: str | None, group_id: str | None, username: str, password: str | None = None) -> TykUserCreateModel:
 
         if user_type == MainUserTypes.SUPER_ADMIN:
             return TykUserGenerator.generate_super_admin_user(username, password)
 
         elif user_type == MainUserTypes.ORG_ADMIN:
             if org_id is None:
-                raise ValueError("org_id is required for org_admin users.")
+                raise ValueError(f"org_id is required for {user_type.value} users.")
             return TykUserGenerator.generate_org_admin_user(org_id, username, password)
 
-        elif user_type == MainUserTypes.BASIC_USER:
+        elif user_type == MainUserTypes.BASIC_USER or user_type == MainUserTypes.READ_ONLY_USER:
             if org_id is None or group_id is None:
-                raise ValueError("org_id and group_id are required for basic_user users.")
+                raise ValueError(f"org_id and group_id are required for {user_type.value} users.")
             return TykUserGenerator.generate_basic_user(org_id, group_id, username, password)
 
         elif user_type == MainUserTypes.GATEWAY_USER:
             if org_id is None or group_id is None:
-                raise ValueError("org_id and group_id are required for gateway_user users.")
+                raise ValueError(f"org_id and group_id are required for {user_type.value} users.")
             return TykUserGenerator.generate_gateway_user(org_id, group_id, username)
         
         else:

@@ -1,5 +1,5 @@
 from ..base import BaseAPI, TykDashboardAdminApi
-from tyk_api.src.models import TykUserModel
+from tyk_api.src.models import TykUserModel, TykUserCreateModel, TykUserUpdateModel
 
 
 class TykUsersAdminApi(TykDashboardAdminApi):
@@ -7,7 +7,7 @@ class TykUsersAdminApi(TykDashboardAdminApi):
     def __init__(self, api: BaseAPI, base_uri: str = "/admin/users"):
         super().__init__(api, base_uri)
 
-    async def create_user(self, user: TykUserModel) -> TykUserModel:
+    async def create_user(self, user: TykUserCreateModel) -> TykUserModel:
         body = user.model_dump(exclude_none=True, exclude={"password"}, mode="json")
 
         response = await self.api.client.post(self.base_uri, json=body)
@@ -19,13 +19,13 @@ class TykUsersAdminApi(TykDashboardAdminApi):
         if user.password is not None:
             created_user.password = user.password
 
-            return await self.update_user(created_user)
+            return await self.update_user(TykUserUpdateModel.model_validate(created_user, extra="allow", from_attributes=True))
 
         return created_user
 
 
 
-    async def update_user(self, user: TykUserModel) -> TykUserModel:
+    async def update_user(self, user: TykUserUpdateModel) -> TykUserModel:
 
         if user.id is None:
             raise ValueError("User ID is required for update")
@@ -35,5 +35,10 @@ class TykUsersAdminApi(TykDashboardAdminApi):
         response = await self.api.client.put(f"{self.base_uri}/{user.id}", json=body)
 
         response.raise_for_status()
+        
+        updated_user = TykUserModel.model_validate(response.json().get("Meta", {}) or {})
+        
+        if user.password is not None:
+            updated_user.password = user.password
 
-        return user
+        return updated_user

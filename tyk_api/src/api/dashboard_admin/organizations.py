@@ -1,5 +1,5 @@
 from ..base import BaseAPI, TykDashboardAdminApi
-from tyk_api.src.models import TykOrganizationModel
+from tyk_api.src.models import TykOrganizationModel, TykOrganizationCreateModel, TykOrganizationUpdateModel
 
 ORGANIZATIONS_KEY = "organisations"
 
@@ -26,7 +26,7 @@ class TykOrganizationsApi(TykDashboardAdminApi):
 
         return TykOrganizationModel.model_validate(response.json())
 
-    async def create_organization(self, org: TykOrganizationModel) -> TykOrganizationModel:
+    async def create_organization(self, org: TykOrganizationCreateModel) -> TykOrganizationModel:
         response = await self.api.client.post(self.base_uri, json=org.model_dump())
 
         response.raise_for_status()
@@ -36,11 +36,9 @@ class TykOrganizationsApi(TykDashboardAdminApi):
         if org_id is None:
             raise ValueError("Failed to create organization: Missing Meta field in response")
 
-        org.id = org_id
+        return await self.get_organization(org_id)
 
-        return org
-
-    async def update_organization(self, org: TykOrganizationModel) -> TykOrganizationModel:
+    async def update_organization(self, org: TykOrganizationUpdateModel) -> TykOrganizationModel:
         response = await self.api.client.put(f"{self.base_uri}/{org.id}", json=org.model_dump())
 
         response.raise_for_status()

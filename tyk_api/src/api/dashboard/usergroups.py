@@ -1,5 +1,6 @@
+from httpx import HTTPStatusError
 from ..base import BaseAPI, TykDashboardApi
-from tyk_api.src.models import TykUserGroupModel, TykUserGroupPermissions
+from tyk_api.src.models import TykUserGroupModel, TykUserGroupCreateModel, TykUserGroupUpdateModel
 
 USER_GROUPS_KEY = "groups"
 
@@ -26,7 +27,7 @@ class TykUserGroupsAPI(TykDashboardApi):
         
         return TykUserGroupModel.model_validate(response.json())
 
-    async def create_usergroup(self, group: TykUserGroupModel) -> TykUserGroupModel:
+    async def create_usergroup(self, group: TykUserGroupCreateModel) -> TykUserGroupModel:
         
         body = group.model_dump(exclude_none=True)
 
@@ -34,15 +35,10 @@ class TykUserGroupsAPI(TykDashboardApi):
         response.raise_for_status()
         
         group_id = response.json().get("Meta")
-        
-        if group_id is None:
-            raise ValueError("Failed to create user group: Missing Meta field in response")
-        
-        group.id = group_id
-        
-        return group
 
-    async def update_usergroup(self, group: TykUserGroupModel):
+        return await self.get_usergroup(group_id)
+
+    async def update_usergroup(self, group: TykUserGroupUpdateModel):
         
         body = group.model_dump(exclude_none=True)
         

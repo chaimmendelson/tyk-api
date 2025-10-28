@@ -22,6 +22,12 @@ class TykApisApi(TykDashboardApi):
         
         return object_ids
     
+    async def get_api(self, api_id: str) -> dict:
+        response = await self.api.client.get(f"{self.base_uri}/{api_id}")
+        response.raise_for_status()
+        
+        return response.json()
+    
     async def delete_api(self, api_id: str) -> None:
         response = await self.api.client.delete(f"{self.base_uri}/{api_id}")
         response.raise_for_status()
