@@ -128,3 +128,14 @@ class CreateReadOnlyUserRequest(CreateUserRequest):
         )
         
         return user
+    
+class DeleteUserRequest(BaseModel):
+    
+    org_id: str = Field(
+        ...,
+        description="The organizatiion Id in which you wish to delete the user"
+    )
+    
+    username: str = Field(
+        ...,
+    )

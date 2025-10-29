@@ -17,7 +17,7 @@ class TykUserModel(BaseModel):
     id: str
     first_name: Optional[str] = None
     last_name: Optional[str] = None
-    email_address: Optional[EmailStr] = None
+    email_address: EmailStr
     password: Optional[str] = None
     org_id: Optional[str] = None
     active: Optional[bool] = True

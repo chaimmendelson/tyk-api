@@ -58,3 +58,8 @@ class TykUsersRepository(TykHybridRepository[TykUsersApi, TykUsersAdminApi]):
 
     async def get_self(self) -> TykUserModel:
         return await self.dashboard_api.get_self()
+
+    async def delete_user_by_email(self, email: str, org_id: str) -> None:
+        user = await self.get_user_by_email_and_organization(email, org_id)
+        if user:
+            await self.delete_user(user)

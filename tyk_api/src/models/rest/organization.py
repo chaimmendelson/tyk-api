@@ -16,3 +16,7 @@ class CreateOrganizationRequest(BaseModel):
         )
 
         return organization
+
+class DeleteOrganizationRequest(BaseModel):
+    app_name: str
+    org_name: str

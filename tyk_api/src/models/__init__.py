@@ -6,11 +6,6 @@ from .tyk import (
     TykOrganizationModel,
     TykUserGroupModel,
     TykPermissionLevel,
-    TykIdentityManagementProfileModel,
-    TykIdentityManagementProfileUseProviderModel,
-    TykIdentityManagementProfileProviderConfigModel,
-    TykIdentityManagementProfileIdentityHandlerConfigModel,
-    TykIdentityManagementProfileProviderConstraintsModel,
     TykUserCreateModel,
     TykUserGroupCreateModel,
     TykOrganizationCreateModel,
@@ -27,7 +22,11 @@ from .wrapper import (
 from .rest import (
     CreateUserRequest,
     CreateBasicUserRequest,
+    DeleteUserRequest,
     CreateOrganizationRequest,
+    DeleteOrganizationRequest,
+    CreateApplicationRequest,
+    DeleteApplicationRequest,
 )
 
 __all__ = [
@@ -39,11 +38,6 @@ __all__ = [
     "TykOrganizationModel",
     "TykUserGroupModel",
     "TykPermissionLevel",
-    "TykIdentityManagementProfileModel",
-    "TykIdentityManagementProfileUseProviderModel",
-    "TykIdentityManagementProfileProviderConfigModel",
-    "TykIdentityManagementProfileIdentityHandlerConfigModel",
-    "TykIdentityManagementProfileProviderConstraintsModel",
     "TykUserCreateModel",
     "TykUserGroupCreateModel",
     "TykOrganizationCreateModel",
@@ -58,5 +52,9 @@ __all__ = [
     # rest
     "CreateUserRequest",
     "CreateBasicUserRequest",
+    "DeleteUserRequest",
     "CreateOrganizationRequest",
+    "DeleteOrganizationRequest",
+    "CreateApplicationRequest",
+    "DeleteApplicationRequest"
 ]

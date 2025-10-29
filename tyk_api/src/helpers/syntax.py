@@ -8,6 +8,10 @@ app_regex = settings.syntax.APPLICATION_REGEX_PATTERN
 org_regex = settings.syntax.ORGANIZATION_REGEX_PATTERN
 
 
+def create_email(username: str) -> str:
+    domain = settings.EMAIL_DOMAIN
+    return f"{username}@{domain}"
+
 def validate_application_name(app_name: str) -> str:
     
     app_name = app_name.lower()

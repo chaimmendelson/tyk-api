@@ -6,3 +6,9 @@ class CreateApplicationRequest(BaseModel):
         ...,
         pattern=settings.syntax.APPLICATION_REGEX_PATTERN,
     )
+
+class DeleteApplicationRequest(BaseModel):
+    app_name: str = Field(
+        ...,
+        pattern=settings.syntax.APPLICATION_REGEX_PATTERN,
+    )
