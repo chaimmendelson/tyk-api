@@ -14,6 +14,14 @@ class TykNotFoundError(TykAPIError):
         self.resource = resource
         self.identifier = identifier
         super().__init__(f"{resource} with identifier '{identifier}' not found.", status_code=404)
+
+class TykFailedToCreateError(TykAPIError):
+    """Raised when a resource creation fails."""
+    
+    def __init__(self, resource: str, reason: str):
+        self.resource = resource
+        self.reason = reason
+        super().__init__(f"Failed to create {resource}: {reason}", status_code=500)
         
 class TykBadRequestError(TykAPIError):
     """Raised when a bad request is made to the Tyk API."""

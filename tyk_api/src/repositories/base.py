@@ -3,20 +3,22 @@ from typing import Generic, TypeVar, Type, Self
 from tyk_api.src.api import TykDashboardApi, TykDashboardAdminApi
 from tyk_api.src.errors import TykAPIError
 from .master_users import TykMasterUsersRepository
+from httpx import HTTPStatusError
+from ..errors import TykAPIError, TykBadRequestError, TykNotFoundError
+
+master_users_repo = TykMasterUsersRepository.instance()
 
 T = TypeVar("T", bound=TykDashboardApi)
 A = TypeVar("A", bound=TykDashboardAdminApi)
 
 async def get_key(org_id: str | None = None, admin: bool = False) -> str:
     
-    master_users = await TykMasterUsersRepository.instance()
-    
     if admin:
-        return await master_users.get_super_admin_key()
-    
+        return await master_users_repo.get_super_admin_key()
+
     if org_id:
-        return await master_users.get_org_admin_key(org_id)
-    
+        return await master_users_repo.get_org_admin_key(org_id)
+
     raise TykAPIError("Either org_id or admin must be specified to get an API key")
     
 # ---------------------------------------------------------------------
@@ -29,7 +31,25 @@ class TykRepository:
     async def instance(cls, *args, **kwargs) -> Self:
         """Base instance builder — subclasses override as needed."""
         return cls(*args, **kwargs)
-
+    
+    def handle_response_error(self, error: HTTPStatusError, resource: str, identifier: str = "") -> Exception:
+        
+        if not error.response:
+            raise TykAPIError("No response for the api request")
+        
+        text = error.response.text or "No content"
+        match error.response.status_code:
+            
+            case 400:
+                raise TykBadRequestError(text)
+            case 401:
+                raise TykBadRequestError(f"User not authorized to perform this request on {resource}")
+            case 404:
+                raise TykNotFoundError(resource=resource, identifier=identifier)
+            case 500:
+                raise TykAPIError(f"Error from upstream: {text}")
+            case _:
+                raise TykAPIError(f"Unhandeld error from upstream, got {error.response.status_code} - {text}")
 
 # ---------------------------------------------------------------------
 # Dashboard Repository

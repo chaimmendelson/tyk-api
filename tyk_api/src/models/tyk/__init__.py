@@ -20,14 +20,6 @@ from .organization import (
     TykOrganizationUpdateModel,
 )
 
-from .identity_management_profile import (
-    TykIdentityManagementProfileModel,
-    TykIdentityManagementProfileUseProviderModel,
-    TykIdentityManagementProfileProviderConfigModel,
-    TykIdentityManagementProfileIdentityHandlerConfigModel,
-    TykIdentityManagementProfileProviderConstraintsModel,
-)
-
 __all__ = [
     # user
     "TykUserModel",
@@ -47,11 +39,4 @@ __all__ = [
     "TykOrganizationModel",
     "TykOrganizationCreateModel",
     "TykOrganizationUpdateModel",
-
-    # identity_management_profile
-    "TykIdentityManagementProfileModel",
-    "TykIdentityManagementProfileUseProviderModel",
-    "TykIdentityManagementProfileProviderConfigModel",
-    "TykIdentityManagementProfileIdentityHandlerConfigModel",
-    "TykIdentityManagementProfileProviderConstraintsModel",
 ]

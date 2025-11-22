@@ -48,7 +48,8 @@ def check_application_name(existing_apps: list, new_app_name: str) -> bool:
     
     return (
         new_app_name in existing_apps or
-        any(app.startswith(f"{new_app_name}{app_org_sep}") for app in existing_apps)
+        any(app.startswith(f"{new_app_name}{app_org_sep}") for app in existing_apps) or
+        any(new_app_name.startswith(f"{app}{app_org_sep}") for app in existing_apps)
     )
     
 def check_organization_name(existing_orgs: list, new_org_name: str) -> bool:

@@ -4,6 +4,7 @@ from .usergroups import TykUserGroupsRepository
 from ..generators import TykUserGroupGenerator
 from ..errors import TykAPIWrapperError, TykNotFoundError
 from ..settings import settings
+from ..helpers.syntax import check_application_name
 
 OBJ_NAME = "application"
 PREFIX = settings.syntax.APPLICATION_USERGROUP_PREFIX
@@ -26,7 +27,15 @@ class TykApplicationsRepository(TykDashboardRepository[TykUserGroupsAPI]):
         return [ug_name.removeprefix(PREFIX) for ug_name in app_usergroups]
     
     async def create_application_usergroup(self, app_name: str) -> str:
-        
+
+        existing_apps = await self.get_applications()
+
+        if app_name in existing_apps:
+            raise TykAPIWrapperError(f"{OBJ_NAME.capitalize()} with name '{app_name}' already exists")
+
+        if check_application_name(existing_apps, app_name):
+            raise TykAPIWrapperError(f"{OBJ_NAME.capitalize()} with name similar to '{app_name}' already exists")
+
         usergroup_model = await self.usergroup_repo.create_usergroup(
             usergroup=TykUserGroupGenerator.generate_application_usergroup(app_name)
         )

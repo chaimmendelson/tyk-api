@@ -10,6 +10,8 @@ from .usergroups import TykUserGroupsRepository
 from .users import TykUsersRepository
 from .applications import TykApplicationsRepository
 
+master_users_repo = TykMasterUsersRepository.instance()
+
 __all__ = [
     "TykMasterUsersRepository",
     "TykOrganizationsRepository",
@@ -22,4 +24,5 @@ __all__ = [
     "TykUserGroupsRepository",
     "TykUsersRepository",
     "TykApplicationsRepository",
+    "master_users_repo",
 ]

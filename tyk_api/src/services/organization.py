@@ -8,7 +8,7 @@ from ..repositories import (
     TykOrganizationsRepository,
     TykPoliciesRepository,
     TykWebHooksRepository,
-    TykMasterUsersRepository,
+    master_users_repo,
 )
 from ..models import (
     TykOrganizationModel,
@@ -138,7 +138,7 @@ class OrganizationService:
         user_password: str,
     ) -> None:
         """Create initial resources and basic users for a new organization."""
-        await (await TykMasterUsersRepository.instance()).bootstrap_org_admin(org.id)
+        await master_users_repo.bootstrap_org_admin(org.id)
 
         for username in {org.owner_name, org.owner_slug} - {None}:
 
