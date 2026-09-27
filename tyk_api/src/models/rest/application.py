@@ -1,14 +1,10 @@
-from pydantic import BaseModel, Field
-from ...settings import settings
+from ..wrapper.application import Application, ApplicationSlim
 
-class CreateApplicationRequest(BaseModel):
-    app_name: str = Field(
-        ...,
-        pattern=settings.syntax.APPLICATION_REGEX_PATTERN,
-    )
+class CreateApplicationRequest(Application):
+    pass
 
-class DeleteApplicationRequest(BaseModel):
-    app_name: str = Field(
-        ...,
-        pattern=settings.syntax.APPLICATION_REGEX_PATTERN,
-    )
+class UpdateApplicationRequest(Application):
+    pass
+
+class DeleteApplicationRequest(ApplicationSlim):
+    pass

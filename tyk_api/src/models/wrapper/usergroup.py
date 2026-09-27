@@ -1,10 +1,12 @@
 from enum import Enum
 from pathlib import Path
 import yaml
+from strawberry.utils.await_maybe import await_maybe
 
 from tyk_api.src.models import TykUserGroupPermissions, TykPermissionLevel
 from tyk_api.src.settings import settings
-
+from ..tyk import TykUserGroupCreateModel, TykUserGroupUpdateModel
+from ...repositories import TykUserGroupsRepository
 
 # ------------------------------------------
 # Path to permissions YAML file
@@ -18,17 +20,11 @@ def _load_permissions_file() -> dict[str, dict[str, str]]:
     return yaml.safe_load(PERMISSIONS_FILE.read_text())
 
 
-# ------------------------------------------
-# Load permissions data
-# ------------------------------------------
-_RAW_PERMISSIONS = _load_permissions_file()
-
-
 def _build_permission(group_name: str) -> TykUserGroupPermissions:
     """Build a TykUserGroupPermissions object from YAML data, defaulting to DENY."""
     defaults = {field: TykPermissionLevel.DENY for field in TykUserGroupPermissions.model_fields.keys()}
 
-    provided_raw = _RAW_PERMISSIONS.get(group_name.lower(), {})
+    provided_raw = _load_permissions_file().get(group_name.lower(), {})
     
     if not provided_raw:
         raise ValueError(f"No permissions defined for group '{group_name}'")
@@ -60,3 +56,33 @@ class MainUserGroups(str, Enum):
         except Exception:
             # fallback to deny all if anything goes wrong
             return _build_permission(settings.DENY_ALL_USER_GROUP_NAME)
+
+    @property
+    def create_model(self) -> TykUserGroupCreateModel:
+        """Return a TykUserGroupCreateModel for this main user group."""
+        return TykUserGroupCreateModel(
+            name=self.value,
+            user_permissions=self.permissions
+        )
+
+    def get_update_model(self, model_id) -> TykUserGroupUpdateModel:
+        """Return a TykUserGroupUpdateModel for this main user group."""
+        from tyk_api.src.models import TykUserGroupUpdateModel
+
+        return TykUserGroupUpdateModel(
+            id=model_id,
+            name=self.value,
+            user_permissions=self.permissions
+        )
+
+    @property
+    async def id(self):
+        repo = await TykUserGroupsRepository.instance()
+        group = await repo.get_main_usergroup(self)
+
+        return group.id
+
+    async def delete(self) -> None:
+        repo = await TykUserGroupsRepository.instance(admin=True)
+        await repo.delete_main_usergroup(self)
+

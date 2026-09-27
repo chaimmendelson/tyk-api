@@ -109,3 +109,10 @@ class TykUsersRepository(TykHybridRepository[TykUsersApi, TykUsersAdminApi]):
         user = await self.get_user_by_email_and_organization(email, org_id)
         
         await self.delete_user(user)
+
+    async def change_user_password(self, user: TykUserUpdateModel, new_password: str) -> None:
+        try:
+            user.password = new_password
+            await self.update_user(user)
+        except HTTPStatusError as e:
+            super().handle_response_error(e, RESOURCE, f"{user.id=}")

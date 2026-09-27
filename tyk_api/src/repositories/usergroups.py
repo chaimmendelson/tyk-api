@@ -1,6 +1,5 @@
 from httpx import HTTPStatusError
 from tyk_api.src.api import TykUserGroupsAPI
-from tyk_api.src.generators import TykUserGroupGenerator
 from tyk_api.src.models import (
     TykUserGroupModel,
     MainUserGroups,
@@ -88,13 +87,12 @@ class TykUserGroupsRepository(TykDashboardRepository[TykUserGroupsAPI]):
 
     async def create_main_usergroup(self, usergroup: MainUserGroups) -> TykUserGroupModel:
         """Create a built-in (main) user group."""
-        ug_model = TykUserGroupGenerator.generate_main_usergroups(usergroup)
-        return await self.create_usergroup(ug_model)
+        return await self.create_usergroup(usergroup.create_model)
 
     async def update_main_usergroup(self, usergroup: MainUserGroups) -> None:
         """Update an existing built-in (main) user group."""
         existing = await self.get_main_usergroup(usergroup)
-        ug_model = TykUserGroupGenerator.generate_main_usergroup_update(usergroup, existing.id)
+        ug_model = usergroup.get_update_model(existing.id)
         await self.update_usergroup(ug_model)
 
     async def delete_main_usergroup(self, usergroup: MainUserGroups) -> None:

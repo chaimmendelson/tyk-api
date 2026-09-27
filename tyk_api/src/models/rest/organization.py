@@ -20,7 +20,3 @@ class CreateOrganizationRequest(BaseModel):
 class DeleteOrganizationRequest(BaseModel):
     app_name: str
     org_name: str
-
-
-class BootstrapOrganizationUsersRequest(CreateOrganizationRequest):
-    password: str

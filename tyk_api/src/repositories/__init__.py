@@ -8,7 +8,6 @@ from .keys import TykKeysRepository
 from .webhooks import TykWebHooksRepository
 from .usergroups import TykUserGroupsRepository
 from .users import TykUsersRepository
-from .applications import TykApplicationsRepository
 
 master_users_repo = TykMasterUsersRepository.instance()
 
@@ -23,6 +22,5 @@ __all__ = [
     "TykWebHooksRepository",
     "TykUserGroupsRepository",
     "TykUsersRepository",
-    "TykApplicationsRepository",
     "master_users_repo",
 ]

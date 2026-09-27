@@ -74,3 +74,8 @@ class TykSettings(BaseSettings):
         default=r"^(?:[A-Za-z]*\d[A-Za-z\d]*[A-Za-z]+|[A-Za-z]*[A-Za-z]+[A-Za-z\d]*\d)[A-Za-z\d]*$",
         description="The regex pattern for validating user passwords.",
     )
+
+    CIPHER_KEY: str = Field(
+        ...,
+        description="The Tyk Cipher Key for encrypting sensitive data.",
+    )

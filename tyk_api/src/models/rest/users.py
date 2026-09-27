@@ -5,16 +5,6 @@ from ...generators import TykUserGenerator
 from ...models import TykUserCreateModel, MainUserTypes
 from ...repositories import TykUserGroupsRepository
 
-async def get_usergroup_id(user_type: MainUserTypes) -> str:
-    
-    repo = await TykUserGroupsRepository.instance(admin=True)
-    
-    if not user_type.usergroup:
-        raise ValueError(f"User of type {user_type.value} doesnt have a usergroup name")
-    
-    usergroup = await repo.get_usergroup_by_name(user_type.usergroup)
-    return usergroup.id
-
 
 class CreateUserRequest(BaseModel):
     
@@ -138,4 +128,20 @@ class DeleteUserRequest(BaseModel):
     
     username: str = Field(
         ...,
+    )
+
+class ChangeUserPasswordRequest(BaseModel):
+
+    org_id: str = Field(
+        ...,
+        description="The organizatiion Id in which you wish to change the user password"
+    )
+
+    username: str = Field(
+        ...,
+    )
+
+    new_password: str = Field(
+        ...,
+        pattern=settings.PASSWORD_REGEX
     )

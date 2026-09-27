@@ -1,7 +1,7 @@
-from .usergroups import MainUserGroups
-from .users import MainUserTypes
+from .usergroup import MainUserGroups
+from .user import MainUsers
 
 __all__ = [
     "MainUserGroups",
-    "MainUserTypes"
+    "MainUsers"
 ]

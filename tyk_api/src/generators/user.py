@@ -5,7 +5,7 @@ from tyk_api.src.models import (
     TykUserAdminPermissions,
     TykUserPermissionsModel,
     TykPermissionLevel,
-    MainUserTypes
+    MainUser
 )
 from tyk_api.src.settings import settings
 
@@ -84,7 +84,7 @@ class TykUserGenerator:
         )
         
     @staticmethod
-    def generate(user_type: MainUserTypes, org_id: str | None, group_id: str | None, username: str, password: str | None = None) -> TykUserCreateModel:
+    def generate(user_type: MainUser, org_id: str | None, group_id: str | None, username: str, password: str | None = None) -> TykUserCreateModel:
 
         if user_type == MainUserTypes.SUPER_ADMIN:
             return TykUserGenerator.generate_super_admin_user(username, password)

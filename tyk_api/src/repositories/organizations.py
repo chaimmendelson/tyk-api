@@ -8,11 +8,10 @@ from tyk_api.src.models import (
 )
 from tyk_api.src.errors import (
     TykNameConflictError,
-    TykAPIError,
     TykNotFoundError,
     TykBadRequestError,
 )
-from ..generators import TykOrganizationGenerator
+
 from ..helpers import syntax
 from .base import TykAdminRepository
 

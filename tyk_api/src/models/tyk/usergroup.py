@@ -39,6 +39,18 @@ class TykUserGroupModel(BaseModel):
     description: Optional[str] = None
     active: Optional[bool] = True
     password_max_days: Optional[int] = 0
+
+    @property
+    def update_model(self) -> "TykUserGroupUpdateModel":
+        return TykUserGroupUpdateModel(
+            id=self.id,
+            name=self.name,
+            org_id=self.org_id,
+            user_permissions=self.user_permissions,
+            description=self.description,
+            active=self.active,
+            password_max_days=self.password_max_days,
+        )
     
 class TykUserGroupCreateModel(BaseModel):
     name: str
