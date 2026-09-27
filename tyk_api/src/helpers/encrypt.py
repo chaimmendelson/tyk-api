@@ -1,13 +1,11 @@
 from cryptography.fernet import Fernet
 
 class PasswordCipher:
-    def __init__(self, key: bytes = None):
+    def __init__(self, key: bytes):
         """
         Initialize the cipher.
         If no key is given, a new one is generated.
         """
-        if key is None:
-            key = Fernet.generate_key()
         self.key = key
         self.cipher = Fernet(key)
 

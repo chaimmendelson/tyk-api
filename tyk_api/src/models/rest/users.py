@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 
 from ...settings import settings
 from ...generators import TykUserGenerator
-from ...models import TykUserCreateModel, MainUserTypes
+from ...models import TykUserCreateModel, MainUserTypes, MainUserGroups
 from ...repositories import TykUserGroupsRepository
 
 
@@ -145,3 +145,19 @@ class ChangeUserPasswordRequest(BaseModel):
         ...,
         pattern=settings.PASSWORD_REGEX
     )
+
+
+async def get_usergroup_id(user_type: MainUserTypes) -> str:
+    """Resolve (and ensure) the main usergroup id for a given user type."""
+    repo = await TykUserGroupsRepository.instance(admin=True)
+
+    if user_type == MainUserTypes.BASIC_USER:
+        group = await repo.ensure_main_usergroup(MainUserGroups.BASIC)
+    elif user_type == MainUserTypes.READ_ONLY_USER:
+        group = await repo.ensure_main_usergroup(MainUserGroups.READ_ONLY)
+    elif user_type == MainUserTypes.GATEWAY_USER:
+        group = await repo.ensure_main_usergroup(MainUserGroups.GATEWAY)
+    else:
+        raise ValueError(f"User type {user_type} does not use a main usergroup")
+
+    return group.id
